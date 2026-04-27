@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ただいま食堂｜東中野の子ども食堂</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&family=Shippori+Mincho:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ivory: #F7F3EE;
+      --cream: #EDE7DC;
+      --terracotta: #C17B5A;
+      --terracotta-light: #D9A080;
+      --sage: #7A9E7E;
+      --sage-light: #A8C4AB;
+      --brown: #5C3D2E;
+      --brown-light: #8B6251;
+      --text: #3A2E28;
+      --text-light: #7A6B62;
+      --white: #FFFDF9;
+      --line-green: #06C755;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      background: var(--ivory);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ローディング */
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: var(--ivory);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+    #loading.hidden { opacity: 0; visibility: hidden; }
+    .loading-text {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1.4rem;
+      color: var(--terracotta);
+      letter-spacing: 0.3em;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+    /* ナビ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 1px 20px rgba(92,61,46,0.08);
+      transition: background 0.4s ease, box-shadow 0.4s ease;
+    }
+    nav.scrolled {
+      background: rgba(247,243,238,0.97);
+      box-shadow: 0 2px 24px rgba(92,61,46,0.12);
+    }
+    .nav-logo {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1.1rem;
+      color: var(--brown);
+      text-decoration: none;
+      letter-spacing: 0.15em;
+    }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      text-decoration: none;
+      letter-spacing: 0.12em;
+      transition: color 0.3s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -3px; left: 0; right: 0;
+      height: 1px;
+      background: var(--terracotta);
+      transform: scaleX(0);
+      transition: transform 0.3s;
+    }
+    .nav-links a:hover { color: var(--terracotta); }
+    .nav-links a:hover::after { transform: scaleX(1); }
+
+    /* ハンバーガーメニュー */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 36px;
+      height: 36px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      z-index: 200;
+    }
+    .hamburger span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background: var(--brown);
+      border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* モバイルメニュー */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(247,243,238,0.98);
+      backdrop-filter: blur(12px);
+      z-index: 150;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2.5rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+    .mobile-menu.open {
+      opacity: 1;
+      visibility: visible;
+    }
+    .mobile-menu-close {
+      position: absolute;
+      top: 1.2rem;
+      right: 1.5rem;
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 0.4rem;
+      line-height: 1;
+      transition: color 0.3s;
+    }
+    .mobile-menu-close:hover { color: var(--terracotta); }
+    .mobile-menu a {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1.4rem;
+      color: var(--brown);
+      text-decoration: none;
+      letter-spacing: 0.2em;
+      transition: color 0.3s;
+    }
+    .mobile-menu a:hover { color: var(--terracotta); }
+
+    /* FV */
+    #fv {
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      padding: 8rem 6rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .fv-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      z-index: 0;
+    }
+    .fv-bg {
+      position: absolute;
+      inset: 0;
+      background: rgba(58,46,40,0.35);
+      z-index: 1;
+    }
+    .fv-content { position: relative; z-index: 2; }
+    .fv-label {
+      display: inline-block;
+      font-size: 0.72rem;
+      letter-spacing: 0.25em;
+      color: rgba(255,255,255,0.9);
+      border: 1px solid rgba(255,255,255,0.5);
+      padding: 0.35rem 1rem;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.5s forwards;
+    }
+    .fv-title {
+      font-family: 'Shippori Mincho', serif;
+      font-size: clamp(2.4rem, 4vw, 3.8rem);
+      font-weight: 700;
+      line-height: 1.4;
+      color: white;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.7s forwards;
+    }
+    .fv-title span { color: #F5C9A0; }
+    .fv-sub {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.85);
+      line-height: 2;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.9s forwards;
+    }
+    .fv-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 1.1s forwards;
+    }
+    .btn-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--line-green);
+      color: white;
+      text-decoration: none;
+      padding: 0.9rem 2rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+      transition: all 0.3s;
+      border-radius: 2px;
+    }
+    .btn-line:hover { background: #05b34a; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(6,199,85,0.3); }
+    .btn-line svg { width: 20px; height: 20px; }
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      border: 1.5px solid white;
+      background: white;
+      color: var(--brown);
+      text-decoration: none;
+      padding: 0.9rem 2rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+      transition: all 0.3s;
+      border-radius: 2px;
+    }
+    .btn-outline:hover { background: var(--brown); border-color: var(--brown); color: white; transform: translateY(-2px); }
+
+    .fv-visual {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      animation: fadeIn 1.2s ease 0.6s forwards;
+    }
+    .fv-illustration {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    /* 数字セクション */
+    #stats {
+      background: var(--cream);
+      padding: 4rem 6rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      text-align: center;
+    }
+    .stat-item { padding: 2rem; }
+    .stat-num {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 3.5rem;
+      color: var(--terracotta);
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .stat-unit { font-size: 1.2rem; }
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--text-light);
+      letter-spacing: 0.15em;
+      margin-top: 0.5rem;
+    }
+
+    /* セクション共通 */
+    section { padding: 7rem 6rem; }
+    .section-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      color: var(--terracotta);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: 'Shippori Mincho', serif;
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      color: var(--brown);
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+    .section-divider {
+      width: 40px;
+      height: 2px;
+      background: var(--terracotta-light);
+      margin-bottom: 2.5rem;
+    }
+
+    /* ABOUT */
+    #about {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+    }
+    .about-text p {
+      font-size: 0.95rem;
+      line-height: 2.2;
+      color: var(--text-light);
+      margin-bottom: 1.2rem;
+    }
+    .about-illustration { text-align: center; }
+
+    /* 開催情報 */
+    #schedule { background: var(--white); }
+    .schedule-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+    .schedule-card {
+      border: 1px solid var(--cream);
+      padding: 2.5rem 2rem;
+      background: var(--ivory);
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .schedule-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--terracotta);
+    }
+    .schedule-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(92,61,46,0.1); }
+    .schedule-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--cream);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.2rem;
+      font-size: 1.4rem;
+    }
+    .schedule-card h3 {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1.1rem;
+      color: var(--brown);
+      margin-bottom: 0.8rem;
+    }
+    .schedule-card p {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      line-height: 1.8;
+    }
+
+    /* LINE連携 */
+    #line-section {
+      background: linear-gradient(135deg, var(--sage) 0%, var(--sage-light) 100%);
+      text-align: center;
+      padding: 6rem;
+      position: relative;
+      overflow: hidden;
+    }
+    #line-section::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+    }
+    .line-content { position: relative; z-index: 1; }
+    .line-icon {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 2rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+    .line-icon svg { width: 50px; height: 50px; }
+    #line-section .section-title { color: white; }
+    .line-features {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      margin: 2rem 0 3rem;
+      flex-wrap: wrap;
+    }
+    .line-feature {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: rgba(255,255,255,0.9);
+      font-size: 0.9rem;
+    }
+    .line-feature::before { content: '✓'; color: white; font-weight: 700; }
+    .btn-line-large {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      background: white;
+      color: var(--sage);
+      text-decoration: none;
+      padding: 1.1rem 3rem;
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      border-radius: 4px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .btn-line-large:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.2); }
+
+    /* 支援方法 */
+    #support {
+      background: var(--ivory);
+    }
+    .support-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+    .support-card {
+      background: white;
+      padding: 3rem 2rem;
+      text-align: center;
+      transition: all 0.3s;
+      border-radius: 2px;
+    }
+    .support-card:hover { transform: translateY(-6px); box-shadow: 0 16px 48px rgba(92,61,46,0.12); }
+    .support-num {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 3rem;
+      color: var(--cream);
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+    .support-card h3 {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1.2rem;
+      color: var(--brown);
+      margin-bottom: 0.8rem;
+    }
+    .support-card p {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+    .btn-small {
+      display: inline-block;
+      border: 1px solid var(--terracotta);
+      color: var(--terracotta);
+      text-decoration: none;
+      padding: 0.6rem 1.5rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      transition: all 0.3s;
+    }
+    .btn-small:hover { background: var(--terracotta); color: white; }
+
+    /* FAQ */
+    #faq { background: var(--cream); }
+    .faq-list { margin-top: 3rem; max-width: 700px; }
+    .faq-item {
+      border-bottom: 1px solid rgba(92,61,46,0.1);
+      padding: 0;
+    }
+    .faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 1.5rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text);
+      text-align: left;
+      gap: 1rem;
+    }
+    .faq-q span:first-child { color: var(--terracotta); font-weight: 700; margin-right: 0.5rem; }
+    .faq-arrow {
+      width: 20px; height: 20px;
+      border-right: 1.5px solid var(--terracotta);
+      border-bottom: 1.5px solid var(--terracotta);
+      transform: rotate(45deg);
+      transition: transform 0.3s;
+      flex-shrink: 0;
+      margin-top: -5px;
+    }
+    .faq-item.open .faq-arrow { transform: rotate(-135deg); margin-top: 5px; }
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease;
+    }
+    .faq-item.open .faq-a { max-height: 200px; }
+    .faq-a p {
+      padding: 0 0 1.5rem 1.5rem;
+      font-size: 0.88rem;
+      color: var(--text-light);
+      line-height: 2;
+    }
+
+    /* お問い合わせ */
+    #contact { background: var(--white); text-align: center; }
+    .contact-inner { max-width: 500px; margin: 0 auto; }
+    .contact-inner p {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      line-height: 2;
+      margin-bottom: 2.5rem;
+    }
+    .contact-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+    /* フッター */
+    footer {
+      background: var(--brown);
+      color: rgba(255,255,255,0.6);
+      text-align: center;
+      padding: 2.5rem;
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+    }
+    footer a { color: rgba(255,255,255,0.4); text-decoration: none; }
+
+    /* LINE ポップアップ */
+    #line-popup {
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s ease;
+    }
+    #line-popup.active { opacity: 1; visibility: visible; }
+    .popup-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(58,46,40,0.5);
+      backdrop-filter: blur(4px);
+    }
+    .popup-card {
+      position: relative;
+      background: white;
+      max-width: 420px;
+      width: 90%;
+      padding: 3rem 2.5rem;
+      text-align: center;
+      border-radius: 4px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+      transform: translateY(20px);
+      transition: transform 0.4s ease;
+    }
+    #line-popup.active .popup-card { transform: translateY(0); }
+    .popup-close {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-light);
+      font-size: 1.2rem;
+      padding: 0.3rem;
+      line-height: 1;
+    }
+    .popup-icon {
+      width: 60px; height: 60px;
+      background: var(--line-green);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+    .popup-icon svg { width: 38px; height: 38px; }
+    .popup-card h3 {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1.3rem;
+      color: var(--brown);
+      margin-bottom: 0.8rem;
+    }
+    .popup-card p {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      line-height: 1.9;
+      margin-bottom: 2rem;
+    }
+    .popup-skip {
+      display: block;
+      margin-top: 1rem;
+      font-size: 0.78rem;
+      color: var(--text-light);
+      cursor: pointer;
+      background: none;
+      border: none;
+      text-decoration: underline;
+    }
+
+    /* フェードアニメーション */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    /* マップ */
+    .map-container {
+      margin-top: 3rem;
+      border-radius: 2px;
+      overflow: hidden;
+      height: 300px;
+      background: var(--cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      border: 1px solid rgba(92,61,46,0.1);
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .mobile-menu { display: flex; }
+      #fv {
+        padding: 7rem 1.5rem 3rem;
+        min-height: 100svh;
+        align-items: flex-start;
+      }
+      .fv-image {
+        object-position: center center;
+        width: 100%;
+        height: 100%;
+      }
+      #stats { grid-template-columns: 1fr; padding: 3rem 2rem; }
+      section { padding: 5rem 2rem; }
+      #about { grid-template-columns: 1fr; gap: 3rem; }
+      .about-illustration { display: none; }
+      .schedule-grid,
+      .support-grid { grid-template-columns: 1fr; }
+      #line-section { padding: 4rem 2rem; }
+      .line-features { gap: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ローディング -->
+<div id="loading">
+  <p class="loading-text">ただいま食堂</p>
+</div>
+
+<!-- ナビ -->
+<nav id="nav">
+  <a href="#" class="nav-logo">ただいま食堂</a>
+  <ul class="nav-links">
+    <li><a href="#about">about</a></li>
+    <li><a href="#schedule">開催情報</a></li>
+    <li><a href="#support">支援する</a></li>
+    <li><a href="#contact">お問い合わせ</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="メニュー">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</nav>
+
+<!-- モバイルメニュー -->
+<div class="mobile-menu" id="mobile-menu">
+  <button class="mobile-menu-close" id="mobile-menu-close" aria-label="閉じる">✕</button>
+  <a href="#about" class="mobile-menu-link">about</a>
+  <a href="#schedule" class="mobile-menu-link">開催情報</a>
+  <a href="#support" class="mobile-menu-link">支援する</a>
+  <a href="#contact" class="mobile-menu-link">お問い合わせ</a>
+</div>
+
+<!-- FV -->
+<section id="fv">
+  <img class="fv-image" src="img/top.png" alt="ただいま食堂">
+  <div class="fv-bg"></div>
+  <div class="fv-content">
+    <div class="fv-label">東中野の子ども食堂</div>
+    <h1 class="fv-title">
+      「ただいま」と<br>言える場所を、<br><span>東中野に。</span>
+    </h1>
+    <p class="fv-sub">
+      地域の子どもたちが安心して集まれる場所。<br>
+      食事を通じて、笑顔と絆をつむぎます。
+    </p>
+    <div class="fv-cta">
+      <a href="https://line.me/R/ti/p/@834vqfgf" target="_blank" class="btn-line" id="fv-line-btn">
+        <img src="img/LINE.png" alt="LINE" style="width:20px;height:20px;object-fit:contain;">
+        LINEで友だち追加
+      </a>
+      <a href="#about" class="btn-outline">活動を知る →</a>
+    </div>
+  </div>
+</section>
+
+<!-- 実績 -->
+<div id="stats">
+  <div class="stat-item fade-up">
+    <div class="stat-num">320<span class="stat-unit">+</span></div>
+    <div class="stat-label">累計来場者数</div>
+  </div>
+  <div class="stat-item fade-up" style="transition-delay:0.15s">
+    <div class="stat-num">24<span class="stat-unit">回</span></div>
+    <div class="stat-label">開催回数</div>
+  </div>
+  <div class="stat-item fade-up" style="transition-delay:0.3s">
+    <div class="stat-num">18<span class="stat-unit">人</span></div>
+    <div class="stat-label">ボランティアスタッフ</div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-text fade-up">
+    <p class="section-label">about</p>
+    <h2 class="section-title">子どもたちの<br>「居場所」をつくる</h2>
+    <div class="section-divider"></div>
+    <p>ただいま食堂は、東中野に暮らす子どもたちが安心して過ごせる場所をつくりたいという思いから始まりました。</p>
+    <p>食事を囲むことで生まれる会話、地域のつながり、笑顔。「食べること」を通じて、子どもたちが孤独を感じることのないように、地域全体で見守り合える環境をつくっていきます。</p>
+    <p>ひとりで食事をとることが多い子ども、経済的な事情でお腹をすかせている子ども——そんな子どもたちに「ただいま」と帰ってこられる場所を届けたいと考えています。</p>
+  </div>
+  <div class="about-illustration fade-up" style="transition-delay:0.2s">
+    <img src="img/house.png" alt="家のイラスト" style="width:100%;max-width:380px;display:block;margin:0 auto;">
+  </div>
+</section>
+
+<!-- 開催情報 -->
+<section id="schedule">
+  <div class="fade-up">
+    <p class="section-label">schedule</p>
+    <h2 class="section-title">開催情報</h2>
+    <div class="section-divider"></div>
+  </div>
+  <div class="schedule-grid">
+    <div class="schedule-card fade-up">
+      <div class="schedule-icon"><img src="img/icon_cal.png" alt="カレンダー" style="width:28px;height:28px;object-fit:contain;"></div>
+      <h3>開催日時</h3>
+      <p>毎月第2・第4土曜日<br>11:00〜14:00<br>（受付：10:45〜）</p>
+    </div>
+    <div class="schedule-card fade-up" style="transition-delay:0.15s">
+      <div class="schedule-icon"><img src="img/icon_loca.png" alt="場所" style="width:28px;height:28px;object-fit:contain;"></div>
+      <h3>場所</h3>
+      <p>東中野コミュニティセンター<br>中野区東中野◯丁目◯番◯号<br>JR東中野駅 徒歩5分</p>
+    </div>
+    <div class="schedule-card fade-up" style="transition-delay:0.3s">
+      <div class="schedule-icon"><img src="img/icon_child.png" alt="対象" style="width:28px;height:28px;object-fit:contain;"></div>
+      <h3>対象・参加費</h3>
+      <p>18歳以下のお子さまと<br>その保護者の方<br><strong>参加費：無料</strong></p>
+    </div>
+  </div>
+  <div class="map-container fade-up" style="height:450px;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6479.637595740553!2d139.6802649482292!3d35.70607644031671!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6018f2c83ab1885b%3A0xe192669bb7699073!2z5p2x5Lit6YeO6aeF!5e0!3m2!1sja!2sjp!4v1777253310263!5m2!1sja!2sjp" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+</section>
+
+<!-- LINE連携 -->
+<section id="line-section">
+  <div class="line-content fade-up">
+    <div class="line-icon">
+      <img src="img/LINE.png" alt="LINE" style="width:50px;height:50px;object-fit:contain;">
+    </div>
+    <p class="section-label" style="color:rgba(255,255,255,0.7)">line</p>
+    <h2 class="section-title">LINEで最新情報を<br>受け取ろう</h2>
+    <div class="line-features">
+      <span class="line-feature">開催日程のお知らせ</span>
+      <span class="line-feature">ボランティア募集情報</span>
+      <span class="line-feature">活動レポート配信</span>
+    </div>
+    <a href="https://line.me/R/ti/p/@834vqfgf" target="_blank" class="btn-line-large" id="line-main-btn">
+      <img src="img/LINE.png" alt="LINE" style="width:24px;height:24px;object-fit:contain;">
+      友だち追加する
+    </a>
+  </div>
+</section>
+
+<!-- 支援方法 -->
+<section id="support">
+  <div class="fade-up">
+    <p class="section-label">support</p>
+    <h2 class="section-title">あなたの力が<br>子どもたちの笑顔になる</h2>
+    <div class="section-divider"></div>
+  </div>
+  <div class="support-grid">
+    <div class="support-card fade-up">
+      <div class="support-num">01</div>
+      <h3>来場する</h3>
+      <p>お子さまと一緒にぜひ遊びに来てください。予約不要でどなたでもご参加いただけます。</p>
+      <a href="#schedule" class="btn-small">開催情報を見る</a>
+    </div>
+    <div class="support-card fade-up" style="transition-delay:0.15s">
+      <div class="support-num">02</div>
+      <h3>ボランティアになる</h3>
+      <p>調理・配膳・子どもたちとの交流など、できることから参加していただけます。</p>
+      <a href="#contact" class="btn-small">申し込む</a>
+    </div>
+    <div class="support-card fade-up" style="transition-delay:0.3s">
+      <div class="support-num">03</div>
+      <h3>寄付・協賛する</h3>
+      <p>食材費や運営費のご支援を受け付けています。企業様の協賛も歓迎しています。</p>
+      <a href="#contact" class="btn-small">詳細を見る</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="fade-up">
+    <p class="section-label">faq</p>
+    <h2 class="section-title">よくある質問</h2>
+    <div class="section-divider"></div>
+  </div>
+  <div class="faq-list fade-up">
+    <div class="faq-item">
+      <button class="faq-q">
+        <span><span>Q.</span>予約は必要ですか？</span>
+        <span class="faq-arrow"></span>
+      </button>
+      <div class="faq-a"><p>予約は不要です。当日そのままお越しください。ただし、LINEで事前に友だち登録いただくと開催情報をいち早くお届けできます。</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">
+        <span><span>Q.</span>参加費はかかりますか？</span>
+        <span class="faq-arrow"></span>
+      </button>
+      <div class="faq-a"><p>18歳以下のお子さまとその保護者の方は無料でご参加いただけます。大人の方（保護者以外）は300円のご協力をお願いしております。</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">
+        <span><span>Q.</span>アレルギーがある場合は？</span>
+        <span class="faq-arrow"></span>
+      </button>
+      <div class="faq-a"><p>LINEまたはお問い合わせフォームからご相談ください。できる範囲で対応いたします。</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">
+        <span><span>Q.</span>ボランティアに参加するには？</span>
+        <span class="faq-arrow"></span>
+      </button>
+      <div class="faq-a"><p>お問い合わせフォームまたはLINEよりお気軽にご連絡ください。学生・社会人・シニアの方など幅広く歓迎しています。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- お問い合わせ -->
+<section id="contact">
+  <div class="contact-inner fade-up">
+    <p class="section-label" style="text-align:center">contact</p>
+    <h2 class="section-title" style="text-align:center">お問い合わせ</h2>
+    <div class="section-divider" style="margin:1.5rem auto 2rem"></div>
+    <p>来場・ボランティア・寄付・その他のご相談など、お気軽にご連絡ください。LINEからも受け付けています。</p>
+    <div class="contact-btns">
+      <a href="https://line.me/R/ti/p/@834vqfgf" target="_blank" class="btn-line">
+        <img src="img/LINE.png" alt="LINE" style="width:18px;height:18px;object-fit:contain;">
+        LINEで問い合わせる
+      </a>
+      <a href="mailto:info@tadaima-shokudo.jp" class="btn-outline">メールで問い合わせる</a>
+    </div>
+  </div>
+</section>
+
+<!-- フッター -->
+<footer>
+  <p style="margin-bottom:0.8rem">
+    <a href="#">プライバシーポリシー</a>
+  </p>
+  <p>© 2025 ただいま食堂（東中野）All Rights Reserved.</p>
+</footer>
+
+<!-- LINEポップアップ -->
+<div id="line-popup">
+  <div class="popup-overlay" id="popup-overlay"></div>
+  <div class="popup-card">
+    <button class="popup-close" id="popup-close">✕</button>
+    <div class="popup-icon">
+      <img src="img/LINE.png" alt="LINE" style="width:38px;height:38px;object-fit:contain;">
+    </div>
+    <h3>LINEで最新情報を<br>受け取りませんか？</h3>
+    <p>開催日程・ボランティア募集・活動レポートをLINEでお届けします。登録は無料です。</p>
+    <a href="https://line.me/R/ti/p/@834vqfgf" target="_blank" class="btn-line" style="width:100%;justify-content:center;border-radius:4px">
+      <img src="img/LINE.png" alt="LINE" style="width:20px;height:20px;object-fit:contain;">
+      友だち追加する
+    </a>
+    <button class="popup-skip" id="popup-skip">今はしない</button>
+  </div>
+</div>
+
+<script>
+  // ローディング
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('loading').classList.add('hidden');
+    }, 1000);
+  });
+
+  // ハンバーガーメニュー
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const toggleMenu = () => {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+    document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+  };
+  const closeMenu = () => {
+    hamburger.classList.remove('open');
+    mobileMenu.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+  hamburger.addEventListener('click', toggleMenu);
+  document.getElementById('mobile-menu-close').addEventListener('click', closeMenu);
+  document.querySelectorAll('.mobile-menu-link').forEach(link => {
+    link.addEventListener('click', closeMenu);
+  });
+
+  // ナビスクロール
+  window.addEventListener('scroll', () => {
+    const nav = document.getElementById('nav');
+    nav.classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // フェードアニメーション
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // FAQ
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.parentElement;
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  // LINEポップアップ
+  const popup = document.getElementById('line-popup');
+  const showPopup = () => popup.classList.add('active');
+  const hidePopup = () => popup.classList.remove('active');
+
+  document.getElementById('popup-close').addEventListener('click', hidePopup);
+  document.getElementById('popup-skip').addEventListener('click', hidePopup);
+  document.getElementById('popup-overlay').addEventListener('click', hidePopup);
+
+  // 離脱検知（マウスがブラウザ上部へ）
+  let popupShown = false;
+  document.addEventListener('mouseleave', (e) => {
+    if (e.clientY < 0 && !popupShown) {
+      popupShown = true;
+      showPopup();
+    }
+  });
+
+  // 滞在時間（30秒後）
+  setTimeout(() => {
+    if (!popupShown) {
+      popupShown = true;
+      showPopup();
+    }
+  }, 30000);
+
+  // スクロール率（70%）
+  window.addEventListener('scroll', () => {
+    const scrollRate = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+    if (scrollRate > 0.7 && !popupShown) {
+      popupShown = true;
+      showPopup();
+    }
+  });
+</script>
+</body>
+</html>
