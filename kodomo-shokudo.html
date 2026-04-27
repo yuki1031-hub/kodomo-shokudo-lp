@@ -100,6 +100,23 @@
     }
     .nav-links a:hover { color: var(--terracotta); }
     .nav-links a:hover::after { transform: scaleX(1); }
+    .nav-btn-white {
+      background: white;
+      color: var(--brown) !important;
+      border: 1.5px solid var(--cream);
+      padding: 0.4rem 1rem;
+      border-radius: 2px;
+      transition: all 0.3s !important;
+    }
+    .nav-btn-white::after { display: none !important; }
+    .nav-btn-white:hover { background: var(--brown) !important; color: white !important; border-color: var(--brown); }
+    .mobile-menu-btn-white {
+      background: white;
+      color: var(--brown) !important;
+      border: 1.5px solid var(--cream);
+      padding: 0.6rem 2rem;
+      border-radius: 2px;
+    }
 
     /* ハンバーガーメニュー */
     .hamburger {
@@ -718,6 +735,7 @@
     <li><a href="#schedule">開催情報</a></li>
     <li><a href="#support">支援する</a></li>
     <li><a href="#contact">お問い合わせ</a></li>
+    <li><a href="https://flying-glazer-dfd.notion.site/LP-34f91932982b806fa1e9cf0202b203a3?source=copy_link" target="_blank" class="nav-btn-white">制作背景</a></li>
   </ul>
   <button class="hamburger" id="hamburger" aria-label="メニュー">
     <span></span>
@@ -733,6 +751,7 @@
   <a href="#schedule" class="mobile-menu-link">開催情報</a>
   <a href="#support" class="mobile-menu-link">支援する</a>
   <a href="#contact" class="mobile-menu-link">お問い合わせ</a>
+  <a href="https://flying-glazer-dfd.notion.site/LP-34f91932982b806fa1e9cf0202b203a3?source=copy_link" target="_blank" class="mobile-menu-link mobile-menu-btn-white">制作背景</a>
 </div>
 
 <!-- FV -->
